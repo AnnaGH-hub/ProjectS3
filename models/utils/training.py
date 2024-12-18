@@ -24,15 +24,6 @@ class Logger(object):
 
 
 class BatchTimer(object):
-    """Batch timing class.
-    Use this class for tracking training and testing time/rate per batch or per sample.
-    
-    Keyword Arguments:
-        rate {bool} -- Whether to report a rate (batches or samples per second) or a time (seconds
-            per batch or sample). (default: {True})
-        per_sample {bool} -- Whether to report times or rates per sample or per batch.
-            (default: {True})
-    """
 
     def __init__(self, rate=True, per_sample=True):
         self.start = time.time()
@@ -64,29 +55,7 @@ def pass_epoch(
     batch_metrics={'time': BatchTimer()}, show_running=True,
     device='cpu', writer=None
 ):
-    """Train or evaluate over a data epoch.
-    
-    Arguments:
-        model {torch.nn.Module} -- Pytorch model.
-        loss_fn {callable} -- A function to compute (scalar) loss.
-        loader {torch.utils.data.DataLoader} -- A pytorch data loader.
-    
-    Keyword Arguments:
-        optimizer {torch.optim.Optimizer} -- A pytorch optimizer.
-        scheduler {torch.optim.lr_scheduler._LRScheduler} -- LR scheduler (default: {None})
-        batch_metrics {dict} -- Dictionary of metric functions to call on each batch. The default
-            is a simple timer. A progressive average of these metrics, along with the average
-            loss, is printed every batch. (default: {{'time': iter_timer()}})
-        show_running {bool} -- Whether or not to print losses and metrics for the current batch
-            or rolling averages. (default: {False})
-        device {str or torch.device} -- Device for pytorch to use. (default: {'cpu'})
-        writer {torch.utils.tensorboard.SummaryWriter} -- Tensorboard SummaryWriter. (default: {None})
-    
-    Returns:
-        tuple(torch.Tensor, dict) -- A tuple of the average loss and a dictionary of average
-            metric values across the epoch.
-    """
-    
+  
     mode = 'Train' if model.training else 'Valid'
     logger = Logger(mode, length=len(loader), calculate_mean=show_running)
     loss = 0
