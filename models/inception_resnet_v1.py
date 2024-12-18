@@ -182,23 +182,7 @@ class Mixed_7a(nn.Module):
 
 
 class InceptionResnetV1(nn.Module):
-    """Inception Resnet V1 model with optional loading of pretrained weights.
-
-    Model parameters can be loaded based on pretraining on the VGGFace2 or CASIA-Webface
-    datasets. Pretrained state_dicts are automatically downloaded on model instantiation if
-    requested and cached in the torch cache. Subsequent instantiations use the cache rather than
-    redownloading.
-
-    Keyword Arguments:
-        pretrained {str} -- Optional pretraining dataset. Either 'vggface2' or 'casia-webface'.
-            (default: {None})
-        classify {bool} -- Whether the model should output classification probabilities or feature
-            embeddings. (default: {False})
-        num_classes {int} -- Number of output classes. If 'pretrained' is set and num_classes not
-            equal to that used for the pretrained model, the final linear layer will be randomly
-            initialized. (default: {None})
-        dropout_prob {float} -- Dropout probability. (default: {0.6})
-    """
+  
     def __init__(self, pretrained=None, classify=False, num_classes=None, dropout_prob=0.6, device=None):
         super().__init__()
 
@@ -270,14 +254,7 @@ class InceptionResnetV1(nn.Module):
             self.to(device)
 
     def forward(self, x):
-        """Calculate embeddings or logits given a batch of input image tensors.
-
-        Arguments:
-            x {torch.tensor} -- Batch of image tensors representing faces.
-
-        Returns:
-            torch.tensor -- Batch of embedding vectors or multinomial logits.
-        """
+       
         x = self.conv2d_1a(x)
         x = self.conv2d_2a(x)
         x = self.conv2d_2b(x)
@@ -301,23 +278,6 @@ class InceptionResnetV1(nn.Module):
             x = F.normalize(x, p=2, dim=1)
         return x
 
-
-def load_weights(mdl, name):
-    """Download pretrained state_dict and load into model.
-
-    Arguments:
-        mdl {torch.nn.Module} -- Pytorch model.
-        name {str} -- Name of dataset that was used to generate pretrained state_dict.
-
-    Raises:
-        ValueError: If 'pretrained' not equal to 'vggface2' or 'casia-webface'.
-    """
-    if name == 'vggface2':
-        path = 'https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20180402-114759-vggface2.pt'
-    elif name == 'casia-webface':
-        path = 'https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20180408-102900-casia-webface.pt'
-    else:
-        raise ValueError('Pretrained models only exist for "vggface2" and "casia-webface"')
 
     model_dir = os.path.join(get_torch_home(), 'checkpoints')
     os.makedirs(model_dir, exist_ok=True)
