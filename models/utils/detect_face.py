@@ -340,21 +340,7 @@ def get_size(img):
 
 
 def extract_face(img, box, image_size=160, margin=0, save_path=None):
-    """Extract face + margin from PIL Image given bounding box.
     
-    Arguments:
-        img {PIL.Image} -- A PIL Image.
-        box {numpy.ndarray} -- Four-element bounding box.
-        image_size {int} -- Output image size in pixels. The image will be square.
-        margin {int} -- Margin to add to bounding box, in terms of pixels in the final image. 
-            Note that the application of the margin differs slightly from the davidsandberg/facenet
-            repo, which applies the margin to the original image before resizing, making the margin
-            dependent on the original image size.
-        save_path {str} -- Save path for extracted face image. (default: {None})
-    
-    Returns:
-        torch.tensor -- tensor representing the extracted face.
-    """
     margin = [
         margin * (box[2] - box[0]) / (image_size - margin),
         margin * (box[3] - box[1]) / (image_size - margin),
