@@ -12,16 +12,7 @@ from models.mtcnn import PNet, RNet, ONet
 
 
 def import_tf_params(tf_mdl_dir, sess):
-    """Import tensorflow model from save directory.
-    
-    Arguments:
-        tf_mdl_dir {str} -- Location of protobuf, checkpoint, meta files.
-        sess {tensorflow.Session} -- Tensorflow session object.
-    
-    Returns:
-        (list, list, list) -- Tuple of lists containing the layer names,
-            parameter arrays as numpy ndarrays, parameter shapes.
-    """
+   
     print('\nLoading tensorflow model\n')
     if callable(tf_mdl_dir):
         tf_mdl_dir(sess)
@@ -46,18 +37,7 @@ def import_tf_params(tf_mdl_dir, sess):
 
 
 def get_layer_indices(layer_lookup, tf_layers):
-    """Giving a lookup of model layer attribute names and tensorflow variable names,
-    find matching parameters.
-    
-    Arguments:
-        layer_lookup {dict} -- Dictionary mapping pytorch attribute names to (partial)
-            tensorflow variable names. Expects dict of the form {'attr': ['tf_name', ...]}
-            where the '...'s are ignored.
-        tf_layers {list} -- List of tensorflow variable names.
-    
-    Returns:
-        list -- The input dictionary with the list of matching inds appended to each item.
-    """
+  
     layer_inds = {}
     for name, value in layer_lookup.items():
         layer_inds[name] = value + [[i for i, n in enumerate(tf_layers) if value[0] in n]]
@@ -65,12 +45,7 @@ def get_layer_indices(layer_lookup, tf_layers):
 
 
 def load_tf_batchNorm(weights, layer):
-    """Load tensorflow weights into nn.BatchNorm object.
-    
-    Arguments:
-        weights {list} -- Tensorflow parameters.
-        layer {torch.nn.Module} -- nn.BatchNorm.
-    """
+   
     layer.bias.data = torch.tensor(weights[0]).view(layer.bias.data.shape)
     layer.weight.data = torch.ones_like(layer.weight.data)
     layer.running_mean = torch.tensor(weights[1]).view(layer.running_mean.shape)
@@ -78,12 +53,7 @@ def load_tf_batchNorm(weights, layer):
 
 
 def load_tf_conv2d(weights, layer, transpose=False):
-    """Load tensorflow weights into nn.Conv2d object.
-    
-    Arguments:
-        weights {list} -- Tensorflow parameters.
-        layer {torch.nn.Module} -- nn.Conv2d.
-    """
+   
     if isinstance(weights, list):
         if len(weights) == 2:
             layer.bias.data = (
@@ -109,23 +79,13 @@ def load_tf_conv2d_trans(weights, layer):
 
 
 def load_tf_basicConv2d(weights, layer):
-    """Load tensorflow weights into grouped Conv2d+BatchNorm object.
-    
-    Arguments:
-        weights {list} -- Tensorflow parameters.
-        layer {torch.nn.Module} -- Object containing Conv2d+BatchNorm.
-    """
+   
     load_tf_conv2d(weights[0], layer.conv)
     load_tf_batchNorm(weights[1:], layer.bn)
 
 
 def load_tf_linear(weights, layer):
-    """Load tensorflow weights into nn.Linear object.
     
-    Arguments:
-        weights {list} -- Tensorflow parameters.
-        layer {torch.nn.Module} -- nn.Linear.
-    """
     if isinstance(weights, list):
         if len(weights) == 2:
             layer.bias.data = (
@@ -202,14 +162,7 @@ def load_tf_repeat_3(weights, layer):
 
 
 def test_loaded_params(mdl, tf_params, tf_layers):
-    """Check each parameter in a pytorch model for an equivalent parameter
-    in a list of tensorflow variables.
-    
-    Arguments:
-        mdl {torch.nn.Module} -- Pytorch model.
-        tf_params {list} -- List of ndarrays representing tensorflow variables.
-        tf_layers {list} -- Corresponding list of tensorflow variable names.
-    """
+   
     tf_means = torch.stack([torch.tensor(p).mean() for p in tf_params])
     for name, param in mdl.named_parameters():
         pt_mean = param.data.mean()
@@ -218,13 +171,7 @@ def test_loaded_params(mdl, tf_params, tf_layers):
 
 
 def compare_model_outputs(pt_mdl, sess, test_data):
-    """Given some testing data, compare the output of pytorch and tensorflow models.
     
-    Arguments:
-        pt_mdl {torch.nn.Module} -- Pytorch model.
-        sess {tensorflow.Session} -- Tensorflow session object.
-        test_data {torch.Tensor} -- Pytorch tensor.
-    """
     print('\nPassing test data through TF model\n')
     if isinstance(sess, tf.Session):
         images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
@@ -268,15 +215,7 @@ def compare_mtcnn(pt_mdl, tf_fun, sess, ind, test_data):
 
 
 def load_tf_model_weights(mdl, layer_lookup, tf_mdl_dir, is_resnet=True, arg_num=None):
-    """Load tensorflow parameters into a pytorch model.
     
-    Arguments:
-        mdl {torch.nn.Module} -- Pytorch model.
-        layer_lookup {[type]} -- Dictionary mapping pytorch attribute names to (partial)
-            tensorflow variable names, and a function suitable for loading weights.
-            Expects dict of the form {'attr': ['tf_name', function]}. 
-        tf_mdl_dir {str} -- Location of protobuf, checkpoint, meta files.
-    """
     tf.reset_default_graph()
     with tf.Session() as sess:
         tf_layers, tf_params, tf_shapes = import_tf_params(tf_mdl_dir, sess)
