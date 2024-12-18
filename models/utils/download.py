@@ -13,17 +13,7 @@ except ImportError:
 
 
 def download_url_to_file(url, dst, hash_prefix=None, progress=True):
-    r"""Download object at the given URL to a local path.
-    Args:
-        url (string): URL of the object to download
-        dst (string): Full path where object will be saved, e.g. `/tmp/temporary_file`
-        hash_prefix (string, optional): If not None, the SHA256 downloaded file should start with `hash_prefix`.
-            Default: None
-        progress (bool, optional): whether or not to display a progress bar to stderr
-            Default: True
-    Example:
-        >>> torch.hub.download_url_to_file('https://s3.amazonaws.com/pytorch/models/resnet18-5c106cde.pth', '/tmp/temporary_file')
-    """
+    
     file_size = None
     # We use a different API for python2 since urllib(2) doesn't recognize the CA
     # certificates in older Python
